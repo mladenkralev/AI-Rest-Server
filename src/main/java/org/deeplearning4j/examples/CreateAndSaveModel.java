@@ -33,8 +33,8 @@ import java.util.Random;
 
 /**
  * Created by mladen on 7/9/2017.
+ * Class that creates and saves a model using mnist model full with digit pictures
  */
-
 public class CreateAndSaveModel {
     private static Logger log = LoggerFactory.getLogger(CreateAndSaveModel.class);
 

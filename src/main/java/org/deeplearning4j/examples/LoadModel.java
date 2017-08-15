@@ -21,6 +21,7 @@ import java.util.Random;
 
 /**
  * Created by mladen on 7/30/2017.
+ * Class for Loading Model
  */
 public class LoadModel {
     private static Logger log = LoggerFactory.getLogger(LoadModel.class);

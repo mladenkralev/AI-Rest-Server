@@ -9,39 +9,26 @@ import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by mladen on 7/30/2017.
  */
-public class WorkingDemo {
-    private static Logger log = LoggerFactory.getLogger(WorkingDemo.class);
+public class MachineLearningModel {
+    private static Logger log = LoggerFactory.getLogger(MachineLearningModel.class);
 
-    public static String fileChose() {
-        JFileChooser fc = new JFileChooser();
-        int ret = fc.showOpenDialog(null);
-        if (ret == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
-            String filename = file.getAbsolutePath();
-            return filename;
-        } else {
-            return null;
-        }
-    }
+    private static int height = 28;
+    private static int width = 28;
+    private static int channels = 1;
 
-    public static void main(String[] args) throws Exception {
-        int height = 28;
-        int width = 28;
-        int channels = 1;
+    public static int guessDigit(String pathToImage) throws IOException {
+
 
         // recordReader.getLabels()
         List<Integer> labelList = Arrays.asList(2, 3, 7, 1, 6, 4, 0, 5, 8, 9);
-
-        // pop up file chooser
-        String filechose = fileChose().toString();
 
         //LOAD NEURAL NETWORK
 
@@ -54,7 +41,7 @@ public class WorkingDemo {
 
         // FileChose is a string we will need a file
 
-        File file = new File(filechose);
+        File file = new File(pathToImage);
 
         // Use NativeImageLoader to convert to numerical matrix
 
@@ -71,7 +58,7 @@ public class WorkingDemo {
         // Pass through to neural Net
 
         INDArray output = model.output(image);
-        log.info("## The FILE CHOSEN WAS " + filechose);
+        log.info("## The FILE CHOSEN WAS " + pathToImage);
         log.info("## The Neural Nets Pediction ##");
         log.info("## list of probabilities per label ##");
         log.info("## List of Labels in Order## ");
@@ -87,8 +74,8 @@ public class WorkingDemo {
                 maxIndex = index;
             }
         }
+
         System.out.println("Your number is: " + maxIndex + " with probability:[" + max + "]");
+        return maxIndex;
     }
-
-
 }
