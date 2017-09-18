@@ -16,35 +16,35 @@ import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import utll.Constants;
+import static org.deeplearning4j.examples.UtilMachineLearingModel.*;
+
 import java.io.File;
-import java.util.Random;
 
 /**
+ * TODO: After successuflly determinating that a digit on image is same as digit that is guessed
+ * TODO: 1) Save the image as training data
+ * TODO: 2) Load the new model and let theserver work with it
+ * TODO: 3) This should be done once a day, because creating,saving and loading a model is slow operation.
+ */
+
+/**
+ * Class used for loading model.
+ *
  * Created by mladen on 7/30/2017.
- * Class for Loading Model
  */
 public class LoadModel {
     private static Logger log = LoggerFactory.getLogger(LoadModel.class);
 
-    public static void main(String[] args) throws Exception {
-        // image information
-        // 28 * 28 grayscale
-        // grayscale implies single channel
-        int height = 28;
-        int width = 28;
-        int channels = 1;
-        int rngseed = 123;
-        Random randNumGen = new Random(rngseed);
-        int batchSize = 128;
-        int outputNum = 10;
-        int numEpochs = 15;
+    public static final String PATH_TRAINING_DATA = Constants.rootPath + "\\src\\main\\resources\\mnist_png\\training";
+    public static final String PATH_TEST_DATA = Constants.rootPath + "\\src\\main\\resources\\mnist_png\\testing";
 
+    public static void main(String[] args) throws Exception {
         // Define the File Paths
-        File trainData = new File("D:\\deeplearning4jScreencast\\screencasts\\MLPLinearClassifier\\src\\main\\resources\\mnist_png\\training");
-        File testData = new File("D:\\deeplearning4jScreencast\\screencasts\\MLPLinearClassifier\\src\\main\\resources\\mnist_png\\testing");
+        File trainData = new File(PATH_TRAINING_DATA);
+        File testData = new File(PATH_TEST_DATA);
 
         // Define the FileSplit(PATH, ALLOWED FORMATS,random)
-
         FileSplit train = new FileSplit(trainData, NativeImageLoader.ALLOWED_FORMATS, randNumGen);
         FileSplit test = new FileSplit(testData, NativeImageLoader.ALLOWED_FORMATS, randNumGen);
 
@@ -52,7 +52,7 @@ public class LoadModel {
 
         ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
 
-        ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, labelMaker);
+        ImageRecordReader recordReader = new ImageRecordReader(heightImage, widthImage, channels, labelMaker);
 
         // Initialize the record reader
         // add a listener, to extract the name
@@ -72,8 +72,6 @@ public class LoadModel {
 
 
         // Build Our Neural Network
-
-
         log.info("******LOAD TRAINED MODEL******");
         // Details
 
@@ -104,16 +102,12 @@ public class LoadModel {
         // Create Eval object with 10 possible classes
         Evaluation eval = new Evaluation(outputNum);
 
-
         while (testIter.hasNext()) {
             DataSet next = testIter.next();
             INDArray output = model.output(next.getFeatureMatrix());
             eval.eval(next.getLabels(), output);
 
         }
-
         log.info(eval.stats());
-
-
     }
 }

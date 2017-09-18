@@ -29,7 +29,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Random;
+
+import static org.deeplearning4j.examples.UtilMachineLearingModel.*;
 
 /**
  * Created by mladen on 7/9/2017.
@@ -41,15 +42,7 @@ public class CreateAndSaveModel {
     public static void main(String[] args) throws IOException, URISyntaxException {
         // image information
         // 28 * 28 grayscale
-        // grayscale implies single channel
-        int height = 28;
-        int width = 28;
-        int channels = 1;
-        int rngseed = 123;
-        Random randNumGen = new Random(rngseed);
-        int batchSize = 128;
-        int outputNum = 10;
-        int numEpochs = 3;
+
 
         URL trainDataUrl = CreateAndSaveModel.class.getClassLoader().getResource("mnist_png/training");
         URL testDataUrl = CreateAndSaveModel.class.getClassLoader().getResource("mnist_png/testing");
@@ -67,7 +60,7 @@ public class CreateAndSaveModel {
         // Extract the parent path as the image label
         ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
 
-        ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, labelMaker);
+        ImageRecordReader recordReader = new ImageRecordReader(heightImage, widthImage, channels, labelMaker);
 
         // Initialize the record reader
         // add a listener, to extract the name
@@ -101,7 +94,7 @@ public class CreateAndSaveModel {
                 .regularization(true).l2(1e-4)
                 .list()
                 .layer(0, new DenseLayer.Builder()
-                        .nIn(height * width)
+                        .nIn(heightImage * widthImage)
                         .nOut(100)
                         .activation("relu")
                         .weightInit(WeightInit.XAVIER)
@@ -113,7 +106,7 @@ public class CreateAndSaveModel {
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .pretrain(false).backprop(true)
-                .setInputType(InputType.convolutional(height,width,channels))
+                .setInputType(InputType.convolutional(heightImage, widthImage,channels))
                 .build();
 
         MultiLayerNetwork model = new MultiLayerNetwork(conf);

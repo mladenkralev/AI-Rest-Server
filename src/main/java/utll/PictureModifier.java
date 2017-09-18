@@ -2,6 +2,7 @@ package picture;
 
 import org.slf4j.Logger;
 import utll.Constants;
+import utll.LoggerInner;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -12,13 +13,12 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * 
+ *
  * Created by mladen on 8/15/2017.
  */
 public class PictureModifier {
-    private static Logger log = utll.Logger.getLogger();
-
-
-
+    private static Logger log = LoggerInner.getLogger();
 
     static {
         File dir = new File(Constants.tempFolder);
