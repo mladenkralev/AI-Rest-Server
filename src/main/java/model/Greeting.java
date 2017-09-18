@@ -1,6 +1,8 @@
 package model;
 
 /**
+ * Used for testing simple request/response.
+ *
  * Created by mladen on 7/24/2017.
  */
 public class Greeting {

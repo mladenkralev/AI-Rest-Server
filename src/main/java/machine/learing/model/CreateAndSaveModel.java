@@ -1,4 +1,4 @@
-package org.deeplearning4j.examples;
+package machine.learing.model;
 
 import org.datavec.api.io.labels.ParentPathLabelGenerator;
 import org.datavec.api.records.listener.impl.LogRecordListener;
@@ -30,11 +30,17 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import static org.deeplearning4j.examples.UtilMachineLearingModel.*;
+/**
+ * TODO: After successuflly determinating that a digit on image is same as digit that is guessed
+ * TODO: 1) Save the image as training data
+ * TODO: 2) Load the new model and let theserver work with it
+ * TODO: 3) This should be done once a day, because creating,saving and loading a model is slow operation.
+ */
 
 /**
  * Created by mladen on 7/9/2017.
- * Class that creates and saves a model using mnist model full with digit pictures
+ * Class that creates and saves a model using mnist model full with digit pictures.
+ * Not currently used.
  */
 public class CreateAndSaveModel {
     private static Logger log = LoggerFactory.getLogger(CreateAndSaveModel.class);
@@ -42,37 +48,31 @@ public class CreateAndSaveModel {
     public static void main(String[] args) throws IOException, URISyntaxException {
         // image information
         // 28 * 28 grayscale
-
-
         URL trainDataUrl = CreateAndSaveModel.class.getClassLoader().getResource("mnist_png/training");
         URL testDataUrl = CreateAndSaveModel.class.getClassLoader().getResource("mnist_png/testing");
-
 
         // Define the File Paths
         File trainData = new File(trainDataUrl.toURI());
         File testData = new File(testDataUrl.toURI());
 
         // Define the FileSplit(PATH, ALLOWED FORMATS,random)
-
-        FileSplit train = new FileSplit(trainData, NativeImageLoader.ALLOWED_FORMATS, randNumGen);
-        FileSplit test = new FileSplit(testData, NativeImageLoader.ALLOWED_FORMATS, randNumGen);
+        FileSplit train = new FileSplit(trainData, NativeImageLoader.ALLOWED_FORMATS, UtilMachineLearingModel.randNumGen);
+        FileSplit test = new FileSplit(testData, NativeImageLoader.ALLOWED_FORMATS, UtilMachineLearingModel.randNumGen);
 
         // Extract the parent path as the image label
         ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
 
-        ImageRecordReader recordReader = new ImageRecordReader(heightImage, widthImage, channels, labelMaker);
+        ImageRecordReader recordReader = new ImageRecordReader(UtilMachineLearingModel.heightImage, UtilMachineLearingModel.widthImage, UtilMachineLearingModel.channels, labelMaker);
 
         // Initialize the record reader
         // add a listener, to extract the name
-
         recordReader.initialize(train);
         recordReader.setListeners(new LogRecordListener());
 
         // DataSet Iterator
-        DataSetIterator dataIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputNum);
+        DataSetIterator dataIter = new RecordReaderDataSetIterator(recordReader, UtilMachineLearingModel.batchSize, 1, UtilMachineLearingModel.outputNum);
 
         // Scale pixel values to 0-1
-
         DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
         scaler.fit(dataIter);
         dataIter.setPreProcessor(scaler);
@@ -86,7 +86,7 @@ public class CreateAndSaveModel {
         log.info("**** Build Model ****");
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .seed(rngseed)
+                .seed(UtilMachineLearingModel.rngseed)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .iterations(1)
                 .learningRate(0.006)
@@ -94,19 +94,19 @@ public class CreateAndSaveModel {
                 .regularization(true).l2(1e-4)
                 .list()
                 .layer(0, new DenseLayer.Builder()
-                        .nIn(heightImage * widthImage)
+                        .nIn(UtilMachineLearingModel.heightImage * UtilMachineLearingModel.widthImage)
                         .nOut(100)
                         .activation("relu")
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                         .nIn(100)
-                        .nOut(outputNum)
+                        .nOut(UtilMachineLearingModel.outputNum)
                         .activation("softmax")
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .pretrain(false).backprop(true)
-                .setInputType(InputType.convolutional(heightImage, widthImage,channels))
+                .setInputType(InputType.convolutional(UtilMachineLearingModel.heightImage, UtilMachineLearingModel.widthImage, UtilMachineLearingModel.channels))
                 .build();
 
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
@@ -115,7 +115,7 @@ public class CreateAndSaveModel {
         model.setListeners(new ScoreIterationListener(10));
 
         log.info("*****TRAIN MODEL********");
-        for(int i = 0; i<numEpochs; i++){
+        for(int i = 0; i< UtilMachineLearingModel.numEpochs; i++){
             model.fit(dataIter);
         }
 

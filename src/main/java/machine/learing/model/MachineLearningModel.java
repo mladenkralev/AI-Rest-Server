@@ -1,4 +1,4 @@
-package org.deeplearning4j.examples;
+package machine.learing.model;
 
 import org.datavec.image.loader.NativeImageLoader;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -20,6 +20,9 @@ import java.util.List;
 /**
  * Used to load model.
  * <p>
+ *
+ *
+ *
  * Created by mladen on 7/30/2017.
  */
 public class MachineLearningModel {
@@ -37,6 +40,9 @@ public class MachineLearningModel {
      * @throws IOException
      */
     public static int guessDigit(Path pathToImage) throws IOException {
+        if(pathToImage == null ) {
+            throw new IllegalArgumentException("Passed parameter was null" + pathToImage);
+        }
 
         // recordReader.getLabels()
         List<Integer> labelList = Arrays.asList(2, 3, 7, 1, 6, 4, 0, 5, 8, 9);

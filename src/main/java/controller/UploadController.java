@@ -1,15 +1,15 @@
 package controller;
 
-import org.deeplearning4j.examples.MachineLearningModel;
-import org.slf4j.Logger;
+import machine.learing.model.MachineLearningModel;
+import model.GuessedDigit;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import picture.PictureModifier;
 import utll.Constants;
+import utll.LoggerInner;
+import utll.PictureModifier;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -17,20 +17,26 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
+ * Handles uploading multipart/form-data as post request.
+ * <p>
  * Created by mladen on 8/15/2017.
  */
 @RestController
 public class UploadController {
-    private static Logger log = utll.Logger.getLogger();
+    private static org.slf4j.Logger log = LoggerInner.getLogger();
 
     @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
-    public String handleFileUpload(@RequestParam("file") MultipartFile file,
-                                   RedirectAttributes redirectAttributes) {
+    public GuessedDigit handleFileUpload(@RequestParam("file") MultipartFile file) {
+        if ((file.isEmpty()) || (file.getSize() == 0)) {
+            log.info("File was empty! Ignoring request.");
+            return new GuessedDigit("\"file\" needs to be set in url.", -1);
+        }
+
         try {
             if (saveImageToServer(file)) {
-
 
                 BufferedImage original = ImageIO.read(new File(Constants.tempPicture));
 
@@ -42,20 +48,27 @@ public class UploadController {
 
                 PictureModifier.resizeImage(reversedBlackWhite);
 
-                int number = MachineLearningModel.guessDigit(Constants.tempFolder + File.separator + "outputResized.jpg");
+                int number = MachineLearningModel.guessDigit(Paths.get(Constants.tempFolder + File.separator + "outputResized.jpg"));
                 log.info(String.format("Returning digit %d", number));
 
-                return "Your number is " + number;
+                return new GuessedDigit("Your number is", number);
             } else {
-                return "Error occoured when adding a picture";
+                return new GuessedDigit("Error occoured when adding a picture", -1);
             }
         } catch (IOException e) {
             log.info("Exception is throwned: " + e.getMessage() + "\nStacktarace:" + e.getStackTrace());
-            return "Error occoured when adding a picture";
+            return new GuessedDigit("IO Exception was thrown", -1);
         }
 
     }
 
+    /**
+     * Saving incoming image in server.
+     *
+     * @param file to save
+     * @return true if file was created and saved to local storage successfully, false otherwise
+     * @throws IOException
+     */
     private boolean saveImageToServer(MultipartFile file) throws IOException {
         if (!file.isEmpty()) {
             byte[] bytes = file.getBytes();

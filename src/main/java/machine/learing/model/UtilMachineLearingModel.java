@@ -1,4 +1,4 @@
-package org.deeplearning4j.examples;
+package machine.learing.model;
 
 import java.util.Random;
 

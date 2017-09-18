@@ -1,22 +1,22 @@
 package utll;
 
-import org.apache.log4j.Logger;
+import machine.learing.model.MachineLearningModel;
+import org.slf4j.LoggerFactory;
+
 /**
+ * Global logger for the whole project.
+ *
  * Created by mladen on 8/15/2017.
  */
 
-public class Logger {
-    private static Logger loger = org.apache.log4j.Logger.getLogger(Logger.class);
+public class LoggerInner {
+    private static org.slf4j.Logger log = LoggerFactory.getLogger(MachineLearningModel.class);
 
-    static {
-
-    }
-
-    private Logger() {
+    private LoggerInner() {
         throw new IllegalArgumentException("Can't access private class");
     }
 
     public static org.slf4j.Logger getLogger() {
-        return loger;
+        return log;
     }
 }

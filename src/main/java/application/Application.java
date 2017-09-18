@@ -10,6 +10,8 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.context.annotation.ComponentScan;
 
 /**
+ * Starting point of Spring project.
+ *
  * Created by mladen on 7/24/2017.
  */
 @SpringBootApplication

@@ -10,4 +10,7 @@ public class Constants {
     public static String tempFolder = rootPath + File.separator + "tmpFiles" + File.separator;
     public static String tempPicture = tempFolder + File.separator + "inputPicture.jpg";
 
+    private Constants() {
+        throw new IllegalArgumentException("Can't access private class");
+    }
 }
